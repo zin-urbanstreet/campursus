@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Urbanstreet — Projekt-Cockpit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@300;400;500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1a1c;
+    --bg-elevated: #232327;
+    --bg-card: #28282d;
+    --border: #36363c;
+    --border-soft: #2e2e34;
+    --text: #f0eee9;
+    --text-muted: #9a978f;
+    --text-dim: #6b6862;
+    --orange: #ff6b1f;
+    --orange-soft: #ff8a4d;
+    --orange-dim: rgba(255, 107, 31, 0.12);
+    --green: #7fb069;
+    --blue: #6b9bc3;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter Tight', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 400; line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  body { background-image: radial-gradient(ellipse 80% 60% at 80% -10%, rgba(255, 107, 31, 0.08), transparent 60%), radial-gradient(ellipse 60% 40% at 0% 100%, rgba(255, 107, 31, 0.04), transparent 60%); background-attachment: fixed; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 48px 56px 80px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 32px; border-bottom: 1px solid var(--border-soft); margin-bottom: 48px; }
+  .brand { display: flex; flex-direction: column; gap: 4px; }
+  .brand-mark { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--orange); display: flex; align-items: center; gap: 10px; }
+  .brand-mark::before { content: ''; width: 6px; height: 6px; background: var(--orange); border-radius: 50%; box-shadow: 0 0 12px var(--orange); }
+  h1 { font-family: var(--serif); font-weight: 300; font-size: 56px; letter-spacing: -0.03em; line-height: 1; margin-top: 8px; }
+  h1 em { font-style: italic; color: var(--orange); font-weight: 400; }
+  .meta { text-align: right; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--text-muted); line-height: 1.7; }
+  .meta strong { color: var(--text); font-weight: 500; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-bottom: 56px; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+  .stat { padding: 24px 28px; border-right: 1px solid var(--border-soft); display: flex; flex-direction: column; gap: 6px; }
+  .stat:last-child { border-right: none; }
+  .stat-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); }
+  .stat-value { font-family: var(--serif); font-size: 36px; font-weight: 300; letter-spacing: -0.02em; line-height: 1; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
+  .section-title { font-family: var(--serif); font-size: 24px; font-weight: 400; letter-spacing: -0.01em; }
+  .section-count { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--text-muted); }
+  .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1px; background: var(--border-soft); border: 1px solid var(--border-soft); }
+  .project { background: var(--bg-card); padding: 32px; display: flex; flex-direction: column; gap: 20px; transition: background 0.4s ease; position: relative; overflow: hidden; }
+  .project::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 0; background: var(--orange); transition: height 0.4s ease; }
+  .project:hover { background: var(--bg-elevated); }
+  .project:hover::before { height: 100%; }
+  .project-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .project-id { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; }
+  .project-name { font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -0.015em; line-height: 1.15; }
+  .status { display: inline-flex; align-items: center; gap: 8px; padding: 5px 11px; border-radius: 100px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; border: 1px solid; }
+  .status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+  .status.planung { color: var(--blue); border-color: rgba(107, 155, 195, 0.35); background: rgba(107, 155, 195, 0.08); }
+  .status.planung::before { background: var(--blue); }
+  .status.bau { color: var(--orange); border-color: rgba(255, 107, 31, 0.4); background: var(--orange-dim); }
+  .status.bau::before { background: var(--orange); animation: pulse 1.8s ease-in-out infinite; }
+  .status.abgeschlossen { color: var(--green); border-color: rgba(127, 176, 105, 0.35); background: rgba(127, 176, 105, 0.08); }
+  .status.abgeschlossen::before { background: var(--green); }
+  @keyframes pulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 107, 31, 0.6); } 50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(255, 107, 31, 0); } }
+  .description { font-size: 14px; color: var(--text-muted); line-height: 1.6; font-weight: 300; }
+  .progress-block { display: flex; flex-direction: column; gap: 8px; }
+  .progress-meta { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+  .progress-percent { font-family: var(--serif); font-size: 22px; font-weight: 400; color: var(--text); letter-spacing: -0.01em; text-transform: none; }
+  .progress-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; position: relative; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--orange) 0%, var(--orange-soft) 100%); border-radius: 2px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); width: 0; box-shadow: 0 0 12px rgba(255, 107, 31, 0.4); }
+  .contact { display: flex; align-items: center; gap: 12px; padding-top: 18px; margin-top: auto; border-top: 1px solid var(--border-soft); }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--orange-dim); color: var(--orange); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 500; font-size: 14px; border: 1px solid rgba(255, 107, 31, 0.3); }
+  .contact-info { display: flex; flex-direction: column; gap: 2px; }
+  .contact-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .contact-role { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--text-dim); text-transform: uppercase; }
+  .footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border-soft); display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--text-dim); text-transform: uppercase; }
+  @media (max-width: 768px) { .container { padding: 32px 24px 48px; } h1 { font-size: 36px; } .header { flex-direction: column; align-items: flex-start; gap: 24px; } .meta { text-align: left; } .stats { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(2) { border-right: none; } .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--border-soft); } .projects { grid-template-columns: 1fr; } }
+  .fade-in { animation: fadeIn 0.8s ease-out backwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="brand">
+      <span class="brand-mark">Urbanstreet · Projekt-Cockpit</span>
+      <h1>Aktive <em>Projekte</em></h1>
+    </div>
+    <div class="meta">
+      <div>STAND <strong id="today">—</strong></div>
+      <div>KW <strong id="week">—</strong> / 2026</div>
+      <div>KÜSNACHT — ZÜRICH</div>
+    </div>
+  </header>
+  <section class="stats">
+    <div class="stat"><span class="stat-label">Projekte gesamt</span><span class="stat-value">06</span></div>
+    <div class="stat"><span class="stat-label">In Planung</span><span class="stat-value">02</span></div>
+    <div class="stat"><span class="stat-label">In Bau</span><span class="stat-value">03</span></div>
+    <div class="stat"><span class="stat-label">Abgeschlossen</span><span class="stat-value">01</span></div>
+  </section>
+  <div class="section-head">
+    <h2 class="section-title">Portfolio</h2>
+    <span class="section-count">06 EINTRÄGE · SORTIERT NACH FORTSCHRITT</span>
+  </div>
+  <section class="projects">
+    <article class="project">
+      <div><div class="project-id">DEV.02 · SIA-Phase 32</div><div class="project-top"><h3 class="project-name">Campus Elgg</h3><span class="status bau">In Bau</span></div></div>
+      <p class="description">Neubau Bildungscampus mit drei Gebäudeflügeln, Mensa und Aussenanlagen. Holzhybrid-Konstruktion mit Photovoltaik-Vollintegration auf dem Dach.</p>
+      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">68 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="68"></div></div></div>
+      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Projektleitung · Architekt ETH/SIA</span></div></div>
+    </article>
+    <article class="project">
+      <div><div class="project-id">DEV.87 · SIA-Phase 31</div><div class="project-top"><h3 class="project-name">Villette</h3><span class="status bau">In Bau</span></div></div>
+      <p class="description">Villenumbau am Zürichsee, denkmalgeschützte Substanz. Sensible Erweiterung mit modernem Anbau, Materialwahl Naturstein und Eichenholz.</p>
+      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">52 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="52"></div></div></div>
+      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Projektleitung · Architekt ETH/SIA</span></div></div>
+    </article>
+    <article class="project">
+      <div><div class="project-id">DEV.05 · SIA-Phase 41</div><div class="project-top"><h3 class="project-name">Goldbacherstrasse 6</h3><span class="status bau">In Bau</span></div></div>
+      <p class="description">Wohnüberbauung Küsnacht. Baurechtliches Verfahren beim Baurekursgericht Zürich anhängig, parallel laufende Realisierung der unbestrittenen Bauteile.</p>
+      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">41 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="41"></div></div></div>
+      <div class="contact"><div class="avatar">LW</div><div class="contact-info"><span class="contact-name">Lukas Wolfer</span><span class="contact-role">Rechtsvertretung · RA</span></div></div>
+    </article>
+    <article class="project">
+      <div><div class="project-id">DEV.11 · SIA-Phase 22</div><div class="project-top"><h3 class="project-name">Seefeld Residenz</h3><span class="status planung">In Planung</span></div></div>
+      <p class="description">Mehrfamilienhaus mit acht Wohneinheiten, Tiefgarage, gemeinschaftliche Dachterrasse mit Seeblick. Vorprojekt in Abstimmung mit Bauherrschaft.</p>
+      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">22 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="22"></div></div></div>
+      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Chef-Architekt · ETH/SIA</span></div></div>
+    </article>
+    <article class="project">
+      <div><div class="project-id">DEV.14 · SIA-Phase 21</div><div class="project-top"><h3 class="project-name">Quartierzentrum Aarau</h3><span class="status planung">In Planung</span></div></div>
+      <p class="description">Studienauftrag im selektiven Verfahren. Mischnutzung aus Wohnen, Gewerbe und öffentlichem Platz. Konzeptphase, Abgabe Q3 2026.</p>
+      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">12 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="12"></div></div></div>
+      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Chef-Architekt · ETH/SIA</span></div></div>
+    </article>
+    <article class="project">
+      <div><div class="project-id">DEV.78 · SIA-Phase 53</div><div class="project-top"><h3 class="project-name">Atelierhaus Höngg</h3><span class="status abgeschlossen">Abgeschlossen</span></div></div>
+      <p class="description">Übergabe und Schlussabrechnung erfolgt. Gewährleistung läuft bis Q2 2028. Auszeichnung BSA Werkschau 2025.</p>
+      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">100 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="100"></div></div></div>
+      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Chef-Architekt · ETH/SIA</span></div></div>
+    </article>
+  </section>
+  <footer class="footer">
+    <div>URBANSTREET DEVELOPMENT AG · KÜSNACHT</div>
+    <div>SIA 102 · CONFIDENTIAL</div>
+  </footer>
+</div>
+<script>
+  const now = new Date();
+  const fmt = now.toLocaleDateString('de-CH', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+  document.getElementById('today').textContent = fmt;
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
+  const week = Math.ceil((days + startOfYear.getDay() + 1) / 7);
+  document.getElementById('week').textContent = String(week).padStart(2, '0');
+  const bars = document.querySelectorAll('.progress-bar');
+  const projects = document.querySelectorAll('.project');
+  projects.forEach((p, i) => { p.classList.add('fade-in'); p.style.animationDelay = (0.1 + i * 0.08) + 's'; });
+  setTimeout(() => { bars.forEach((bar, i) => { setTimeout(() => { bar.style.width = bar.dataset.progress + '%'; }, i * 120); }); }, 600);
+</script>
+</body>
+</html>
