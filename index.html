@@ -1,163 +1,478 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de-CH">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Urbanstreet — Projekt-Cockpit</title>
+<meta name="description" content="Campus Elgg – Live Investoren-Cockpit für Renditesimulation und Szenarienanalyse">
+<meta name="author" content="Tetris AG / Viaholding AG">
+<title>Campus Elgg · Live-Cockpit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@300;400;500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #1a1a1c;
-    --bg-elevated: #232327;
-    --bg-card: #28282d;
-    --border: #36363c;
-    --border-soft: #2e2e34;
-    --text: #f0eee9;
-    --text-muted: #9a978f;
-    --text-dim: #6b6862;
-    --orange: #ff6b1f;
-    --orange-soft: #ff8a4d;
-    --orange-dim: rgba(255, 107, 31, 0.12);
-    --green: #7fb069;
-    --blue: #6b9bc3;
-    --serif: 'Fraunces', Georgia, serif;
-    --sans: 'Inter Tight', -apple-system, sans-serif;
-    --mono: 'JetBrains Mono', monospace;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 400; line-height: 1.5; -webkit-font-smoothing: antialiased; min-height: 100vh; }
-  body { background-image: radial-gradient(ellipse 80% 60% at 80% -10%, rgba(255, 107, 31, 0.08), transparent 60%), radial-gradient(ellipse 60% 40% at 0% 100%, rgba(255, 107, 31, 0.04), transparent 60%); background-attachment: fixed; }
-  .container { max-width: 1280px; margin: 0 auto; padding: 48px 56px 80px; }
-  .header { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 32px; border-bottom: 1px solid var(--border-soft); margin-bottom: 48px; }
-  .brand { display: flex; flex-direction: column; gap: 4px; }
-  .brand-mark { font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--orange); display: flex; align-items: center; gap: 10px; }
-  .brand-mark::before { content: ''; width: 6px; height: 6px; background: var(--orange); border-radius: 50%; box-shadow: 0 0 12px var(--orange); }
-  h1 { font-family: var(--serif); font-weight: 300; font-size: 56px; letter-spacing: -0.03em; line-height: 1; margin-top: 8px; }
-  h1 em { font-style: italic; color: var(--orange); font-weight: 400; }
-  .meta { text-align: right; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--text-muted); line-height: 1.7; }
-  .meta strong { color: var(--text); font-weight: 500; }
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-bottom: 56px; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
-  .stat { padding: 24px 28px; border-right: 1px solid var(--border-soft); display: flex; flex-direction: column; gap: 6px; }
-  .stat:last-child { border-right: none; }
-  .stat-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); }
-  .stat-value { font-family: var(--serif); font-size: 36px; font-weight: 300; letter-spacing: -0.02em; line-height: 1; }
-  .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
-  .section-title { font-family: var(--serif); font-size: 24px; font-weight: 400; letter-spacing: -0.01em; }
-  .section-count { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--text-muted); }
-  .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1px; background: var(--border-soft); border: 1px solid var(--border-soft); }
-  .project { background: var(--bg-card); padding: 32px; display: flex; flex-direction: column; gap: 20px; transition: background 0.4s ease; position: relative; overflow: hidden; }
-  .project::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 0; background: var(--orange); transition: height 0.4s ease; }
-  .project:hover { background: var(--bg-elevated); }
-  .project:hover::before { height: 100%; }
-  .project-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
-  .project-id { font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; }
-  .project-name { font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -0.015em; line-height: 1.15; }
-  .status { display: inline-flex; align-items: center; gap: 8px; padding: 5px 11px; border-radius: 100px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; border: 1px solid; }
-  .status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
-  .status.planung { color: var(--blue); border-color: rgba(107, 155, 195, 0.35); background: rgba(107, 155, 195, 0.08); }
-  .status.planung::before { background: var(--blue); }
-  .status.bau { color: var(--orange); border-color: rgba(255, 107, 31, 0.4); background: var(--orange-dim); }
-  .status.bau::before { background: var(--orange); animation: pulse 1.8s ease-in-out infinite; }
-  .status.abgeschlossen { color: var(--green); border-color: rgba(127, 176, 105, 0.35); background: rgba(127, 176, 105, 0.08); }
-  .status.abgeschlossen::before { background: var(--green); }
-  @keyframes pulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255, 107, 31, 0.6); } 50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(255, 107, 31, 0); } }
-  .description { font-size: 14px; color: var(--text-muted); line-height: 1.6; font-weight: 300; }
-  .progress-block { display: flex; flex-direction: column; gap: 8px; }
-  .progress-meta { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
-  .progress-percent { font-family: var(--serif); font-size: 22px; font-weight: 400; color: var(--text); letter-spacing: -0.01em; text-transform: none; }
-  .progress-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; position: relative; }
-  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--orange) 0%, var(--orange-soft) 100%); border-radius: 2px; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); width: 0; box-shadow: 0 0 12px rgba(255, 107, 31, 0.4); }
-  .contact { display: flex; align-items: center; gap: 12px; padding-top: 18px; margin-top: auto; border-top: 1px solid var(--border-soft); }
-  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--orange-dim); color: var(--orange); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 500; font-size: 14px; border: 1px solid rgba(255, 107, 31, 0.3); }
-  .contact-info { display: flex; flex-direction: column; gap: 2px; }
-  .contact-name { font-size: 13px; font-weight: 500; color: var(--text); }
-  .contact-role { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--text-dim); text-transform: uppercase; }
-  .footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border-soft); display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--text-dim); text-transform: uppercase; }
-  @media (max-width: 768px) { .container { padding: 32px 24px 48px; } h1 { font-size: 36px; } .header { flex-direction: column; align-items: flex-start; gap: 24px; } .meta { text-align: left; } .stats { grid-template-columns: repeat(2, 1fr); } .stat:nth-child(2) { border-right: none; } .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--border-soft); } .projects { grid-template-columns: 1fr; } }
-  .fade-in { animation: fadeIn 0.8s ease-out backwards; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-  <header class="header">
+
+<!-- ============== TOP BAR ============== -->
+<header class="topbar">
+  <div class="topbar-inner">
     <div class="brand">
-      <span class="brand-mark">Urbanstreet · Projekt-Cockpit</span>
-      <h1>Aktive <em>Projekte</em></h1>
+      <div class="brand-mark">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="4" y="22" width="8" height="14" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="16" y="16" width="8" height="20" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="28" y="10" width="8" height="26" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="2" y1="36.5" x2="38" y2="36.5" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-line-1">Campus Elgg</div>
+        <div class="brand-line-2">Investoren-Cockpit · Live-Simulation</div>
+      </div>
     </div>
-    <div class="meta">
-      <div>STAND <strong id="today">—</strong></div>
-      <div>KW <strong id="week">—</strong> / 2026</div>
-      <div>KÜSNACHT — ZÜRICH</div>
+    <div class="topbar-meta">
+      <div class="meta-block">
+        <span class="meta-label">Stand</span>
+        <span class="meta-value" id="meta-date">—</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">Erstellt für</span>
+        <span class="meta-value">VR Viaholding AG</span>
+      </div>
+      <div class="meta-block">
+        <span class="meta-label">Status</span>
+        <span class="meta-value status-pill" id="scenario-status">Base Case</span>
+      </div>
     </div>
-  </header>
-  <section class="stats">
-    <div class="stat"><span class="stat-label">Projekte gesamt</span><span class="stat-value">06</span></div>
-    <div class="stat"><span class="stat-label">In Planung</span><span class="stat-value">02</span></div>
-    <div class="stat"><span class="stat-label">In Bau</span><span class="stat-value">03</span></div>
-    <div class="stat"><span class="stat-label">Abgeschlossen</span><span class="stat-value">01</span></div>
-  </section>
-  <div class="section-head">
-    <h2 class="section-title">Portfolio</h2>
-    <span class="section-count">06 EINTRÄGE · SORTIERT NACH FORTSCHRITT</span>
   </div>
-  <section class="projects">
-    <article class="project">
-      <div><div class="project-id">DEV.02 · SIA-Phase 32</div><div class="project-top"><h3 class="project-name">Campus Elgg</h3><span class="status bau">In Bau</span></div></div>
-      <p class="description">Neubau Bildungscampus mit drei Gebäudeflügeln, Mensa und Aussenanlagen. Holzhybrid-Konstruktion mit Photovoltaik-Vollintegration auf dem Dach.</p>
-      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">68 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="68"></div></div></div>
-      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Projektleitung · Architekt ETH/SIA</span></div></div>
-    </article>
-    <article class="project">
-      <div><div class="project-id">DEV.87 · SIA-Phase 31</div><div class="project-top"><h3 class="project-name">Villette</h3><span class="status bau">In Bau</span></div></div>
-      <p class="description">Villenumbau am Zürichsee, denkmalgeschützte Substanz. Sensible Erweiterung mit modernem Anbau, Materialwahl Naturstein und Eichenholz.</p>
-      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">52 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="52"></div></div></div>
-      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Projektleitung · Architekt ETH/SIA</span></div></div>
-    </article>
-    <article class="project">
-      <div><div class="project-id">DEV.05 · SIA-Phase 41</div><div class="project-top"><h3 class="project-name">Goldbacherstrasse 6</h3><span class="status bau">In Bau</span></div></div>
-      <p class="description">Wohnüberbauung Küsnacht. Baurechtliches Verfahren beim Baurekursgericht Zürich anhängig, parallel laufende Realisierung der unbestrittenen Bauteile.</p>
-      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">41 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="41"></div></div></div>
-      <div class="contact"><div class="avatar">LW</div><div class="contact-info"><span class="contact-name">Lukas Wolfer</span><span class="contact-role">Rechtsvertretung · RA</span></div></div>
-    </article>
-    <article class="project">
-      <div><div class="project-id">DEV.11 · SIA-Phase 22</div><div class="project-top"><h3 class="project-name">Seefeld Residenz</h3><span class="status planung">In Planung</span></div></div>
-      <p class="description">Mehrfamilienhaus mit acht Wohneinheiten, Tiefgarage, gemeinschaftliche Dachterrasse mit Seeblick. Vorprojekt in Abstimmung mit Bauherrschaft.</p>
-      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">22 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="22"></div></div></div>
-      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Chef-Architekt · ETH/SIA</span></div></div>
-    </article>
-    <article class="project">
-      <div><div class="project-id">DEV.14 · SIA-Phase 21</div><div class="project-top"><h3 class="project-name">Quartierzentrum Aarau</h3><span class="status planung">In Planung</span></div></div>
-      <p class="description">Studienauftrag im selektiven Verfahren. Mischnutzung aus Wohnen, Gewerbe und öffentlichem Platz. Konzeptphase, Abgabe Q3 2026.</p>
-      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">12 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="12"></div></div></div>
-      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Chef-Architekt · ETH/SIA</span></div></div>
-    </article>
-    <article class="project">
-      <div><div class="project-id">DEV.78 · SIA-Phase 53</div><div class="project-top"><h3 class="project-name">Atelierhaus Höngg</h3><span class="status abgeschlossen">Abgeschlossen</span></div></div>
-      <p class="description">Übergabe und Schlussabrechnung erfolgt. Gewährleistung läuft bis Q2 2028. Auszeichnung BSA Werkschau 2025.</p>
-      <div class="progress-block"><div class="progress-meta"><span>Fortschritt</span><span class="progress-percent">100 %</span></div><div class="progress-track"><div class="progress-bar" data-progress="100"></div></div></div>
-      <div class="contact"><div class="avatar">PH</div><div class="contact-info"><span class="contact-name">Patrick Hüppi</span><span class="contact-role">Chef-Architekt · ETH/SIA</span></div></div>
-    </article>
-  </section>
-  <footer class="footer">
-    <div>URBANSTREET DEVELOPMENT AG · KÜSNACHT</div>
-    <div>SIA 102 · CONFIDENTIAL</div>
-  </footer>
-</div>
-<script>
-  const now = new Date();
-  const fmt = now.toLocaleDateString('de-CH', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-  document.getElementById('today').textContent = fmt;
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
-  const week = Math.ceil((days + startOfYear.getDay() + 1) / 7);
-  document.getElementById('week').textContent = String(week).padStart(2, '0');
-  const bars = document.querySelectorAll('.progress-bar');
-  const projects = document.querySelectorAll('.project');
-  projects.forEach((p, i) => { p.classList.add('fade-in'); p.style.animationDelay = (0.1 + i * 0.08) + 's'; });
-  setTimeout(() => { bars.forEach((bar, i) => { setTimeout(() => { bar.style.width = bar.dataset.progress + '%'; }, i * 120); }); }, 600);
-</script>
+</header>
+
+<!-- ============== HERO ============== -->
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-text">
+      <div class="eyebrow">Renditeberechnung · Mai 2026</div>
+      <h1 class="hero-title">
+        <span class="hero-title-line">Mischnutzungs-</span>
+        <span class="hero-title-line italic">projekt</span>
+        <span class="hero-title-line">in Elgg, ZH</span>
+      </h1>
+      <p class="hero-sub">
+        Sechs Gebäude in zwei Etappen. Gewerbe, Büro, Wotel. Live-Simulation
+        relevanter Kennzahlen mit sofortiger Renditeauswirkung.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="hero-invest">—</div>
+          <div class="hero-stat-lab">Anlagekosten Total</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="hero-miete">—</div>
+          <div class="hero-stat-lab">Mietertrag p.a.</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val" id="hero-rendite">—</div>
+          <div class="hero-stat-lab">Bruttorendite</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <!-- Architektonischer Site-Plan stilisiert -->
+      <svg viewBox="0 0 360 480" xmlns="http://www.w3.org/2000/svg" class="site-plan" aria-hidden="true">
+        <defs>
+          <pattern id="dots" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.5" fill="currentColor" opacity="0.25"/>
+          </pattern>
+        </defs>
+        <rect width="360" height="480" fill="url(#dots)"/>
+        <!-- Etappe 1 Häuser A, B, C -->
+        <g class="house" data-house="A">
+          <rect x="50" y="60" width="100" height="90" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <text x="100" y="110" text-anchor="middle" class="house-label">A</text>
+        </g>
+        <g class="house" data-house="B">
+          <rect x="50" y="180" width="100" height="90" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <text x="100" y="230" text-anchor="middle" class="house-label">B</text>
+        </g>
+        <g class="house" data-house="C">
+          <rect x="50" y="300" width="100" height="90" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <text x="100" y="350" text-anchor="middle" class="house-label">C</text>
+        </g>
+        <!-- Strasse Stämpfelfeldstrasse -->
+        <line x1="175" y1="40" x2="175" y2="430" stroke="currentColor" stroke-width="0.5" stroke-dasharray="4 4"/>
+        <text x="175" y="450" text-anchor="middle" class="street-label">Stämpfelfeldstrasse</text>
+        <!-- Etappe 2 Häuser D, E, F -->
+        <g class="house etappe-2" data-house="D">
+          <rect x="200" y="60" width="100" height="90" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <text x="250" y="110" text-anchor="middle" class="house-label">D</text>
+        </g>
+        <g class="house etappe-2" data-house="E">
+          <rect x="200" y="180" width="100" height="90" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <text x="250" y="230" text-anchor="middle" class="house-label">E</text>
+        </g>
+        <g class="house etappe-2" data-house="F">
+          <rect x="200" y="300" width="100" height="90" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <text x="250" y="350" text-anchor="middle" class="house-label">F</text>
+        </g>
+        <!-- Beschriftungen Etappen -->
+        <text x="100" y="40" text-anchor="middle" class="etappe-label">Etappe 1</text>
+        <text x="250" y="40" text-anchor="middle" class="etappe-label">Etappe 2</text>
+        <!-- Nordpfeil -->
+        <g transform="translate(330, 440)">
+          <line x1="0" y1="0" x2="0" y2="-20" stroke="currentColor" stroke-width="1"/>
+          <polygon points="0,-22 -3,-16 3,-16" fill="currentColor"/>
+          <text x="0" y="12" text-anchor="middle" class="north-label">N</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============== KPI ROW ============== -->
+<section class="kpi-section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Kennzahlen Live</h2>
+      <div class="section-toggle">
+        <button class="toggle-btn active" data-view="e1">Etappe 1</button>
+        <button class="toggle-btn" data-view="total">Gesamtprojekt</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-primary">
+        <div class="kpi-label">Anlagekosten</div>
+        <div class="kpi-value" id="kpi-anlagekosten">—</div>
+        <div class="kpi-sub" id="kpi-anlagekosten-sub">BKP 0–9</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Vermietbare Fläche</div>
+        <div class="kpi-value" id="kpi-hnf">—</div>
+        <div class="kpi-sub">Hauptnutzfläche (HNF)</div>
+      </div>
+      <div class="kpi-card kpi-gold">
+        <div class="kpi-label">Soll-Mietertrag p.a.</div>
+        <div class="kpi-value" id="kpi-miete-soll">—</div>
+        <div class="kpi-sub">inkl. Nebenerträge</div>
+      </div>
+      <div class="kpi-card kpi-gold">
+        <div class="kpi-label">Effektiv-Mietertrag</div>
+        <div class="kpi-value" id="kpi-miete-eff">—</div>
+        <div class="kpi-sub">nach Mietausfall</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">Bruttorendite (eff.)</div>
+        <div class="kpi-value" id="kpi-brutto">—</div>
+        <div class="kpi-sub">
+          <span id="kpi-brutto-gap">—</span> vs. Ziel 6.37%
+        </div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">Nettorendite</div>
+        <div class="kpi-value" id="kpi-netto">—</div>
+        <div class="kpi-sub">NOI / Anlagekosten</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">EK-Rendite (Cash-on-Cash)</div>
+        <div class="kpi-value" id="kpi-ek">—</div>
+        <div class="kpi-sub">nach FK-Zinsen</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Landwert (effektiv)</div>
+        <div class="kpi-value" id="kpi-landwert">—</div>
+        <div class="kpi-sub">inkl. Entwicklungskosten</div>
+      </div>
+    </div>
+
+    <!-- Zielbalken -->
+    <div class="target-bar-wrap">
+      <div class="target-bar-header">
+        <span class="target-bar-title">Bruttorendite vs. Zielkorridor</span>
+        <span class="target-bar-legend">
+          <span class="legend-dot legend-current"></span> Aktuell
+          <span class="legend-dot legend-target"></span> Ziel KV (6.37%)
+        </span>
+      </div>
+      <div class="target-bar">
+        <div class="target-bar-track">
+          <div class="target-bar-zone zone-red" style="width: 50%"></div>
+          <div class="target-bar-zone zone-yellow" style="width: 25%"></div>
+          <div class="target-bar-zone zone-green" style="width: 25%"></div>
+          <div class="target-bar-marker target-bar-target" style="left: 63.7%">
+            <div class="marker-line"></div>
+            <div class="marker-label">6.37%</div>
+          </div>
+          <div class="target-bar-marker target-bar-current" id="current-marker" style="left: 0%">
+            <div class="marker-line"></div>
+            <div class="marker-value" id="current-marker-value">—</div>
+          </div>
+        </div>
+        <div class="target-bar-scale">
+          <span>0%</span>
+          <span>2%</span>
+          <span>4%</span>
+          <span>6%</span>
+          <span>8%</span>
+          <span>10%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CONTROLS ============== -->
+<section class="controls-section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Simulation Live-Steuerung</h2>
+      <div class="control-actions">
+        <button class="btn btn-ghost" id="btn-reset" title="Auf Base Case zurücksetzen">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 1 0 1.5-4M2 2v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Zurücksetzen
+        </button>
+        <button class="btn btn-ghost" id="btn-save" title="Aktuelles Szenario speichern">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 2h7l3 3v9H3V2zm0 7h10M6 2v4h4V2" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          Szenario speichern
+        </button>
+        <button class="btn btn-ghost" id="btn-load" title="Gespeichertes Szenario laden">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 3h4l2 2h6v8H2V3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          Laden
+        </button>
+        <button class="btn btn-primary" id="btn-export" title="Als JSON exportieren">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1v10m0 0L4 7m4 4l4-4M2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Export
+        </button>
+      </div>
+    </div>
+
+    <div class="controls-grid">
+      <!-- Block 1: Mietzinse -->
+      <div class="control-block">
+        <div class="control-block-header">
+          <span class="control-num">A</span>
+          <h3>Mietzins-Anpassung</h3>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-miet-faktor">Mietzins-Multiplikator (alle Nutzungen)</label>
+            <span class="control-value" id="val-miet-faktor">100%</span>
+          </div>
+          <input type="range" id="ctrl-miet-faktor" min="60" max="160" value="100" step="1">
+          <div class="control-hint">Multipliziert alle Mietpreise (V1-Basis = 100%, das entspricht Excel-Modell mit +20%)</div>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-leerstand">Leerstand / Mietausfall</label>
+            <span class="control-value" id="val-leerstand">5.0%</span>
+          </div>
+          <input type="range" id="ctrl-leerstand" min="0" max="20" value="5" step="0.5">
+          <div class="control-hint">Anteil unvermieteter Fläche – CH-Gewerbe marktüblich 3–8%</div>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-nebenflaechen">Nebenflächen-Umlage (Methabau-Methode)</label>
+            <span class="control-value" id="val-nebenflaechen">5%</span>
+          </div>
+          <input type="range" id="ctrl-nebenflaechen" min="0" max="15" value="5" step="0.5">
+          <div class="control-hint">Aufschlag auf Mietertrag durch Umlegung Treppenhaus/WC auf HNF</div>
+        </div>
+      </div>
+
+      <!-- Block 2: Kosten -->
+      <div class="control-block">
+        <div class="control-block-header">
+          <span class="control-num">B</span>
+          <h3>Anlagekosten</h3>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-bk-faktor">Baukosten-Faktor</label>
+            <span class="control-value" id="val-bk-faktor">100%</span>
+          </div>
+          <input type="range" id="ctrl-bk-faktor" min="80" max="130" value="100" step="1">
+          <div class="control-hint">Anpassung Gesamtbudget BKP 0–9 – Submissionen können Werte ändern</div>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-landwert-quote">Landwert-Umlagerung (BKP 1 → BKP 0)</label>
+            <span class="control-value" id="val-landwert-quote">80%</span>
+          </div>
+          <input type="range" id="ctrl-landwert-quote" min="0" max="100" value="80" step="5">
+          <div class="control-hint">Anteil der Vorbereitungsarbeiten, der wirtschaftlich Landwert ist</div>
+        </div>
+      </div>
+
+      <!-- Block 3: Finanzierung -->
+      <div class="control-block">
+        <div class="control-block-header">
+          <span class="control-num">C</span>
+          <h3>Finanzierung & Bewirtschaftung</h3>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-ek-quote">Eigenkapital-Quote</label>
+            <span class="control-value" id="val-ek-quote">38.7%</span>
+          </div>
+          <input type="range" id="ctrl-ek-quote" min="20" max="60" value="38.7" step="0.5">
+          <div class="control-hint">Bank-Anforderung Gewerbe CH typisch 30–40%</div>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-fk-zins">Fremdkapital-Zinssatz</label>
+            <span class="control-value" id="val-fk-zins">2.5%</span>
+          </div>
+          <input type="range" id="ctrl-fk-zins" min="0.5" max="6" value="2.5" step="0.1">
+          <div class="control-hint">Hypothekarzins aktuell</div>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-bewirt">Bewirtschaftung + Unterhalt</label>
+            <span class="control-value" id="val-bewirt">23%</span>
+          </div>
+          <input type="range" id="ctrl-bewirt" min="10" max="35" value="23" step="0.5">
+          <div class="control-hint">% vom Soll-Mietzins für Hauswartung, Versicherung, Rückstellungen</div>
+        </div>
+      </div>
+
+      <!-- Block 4: Nebenerträge -->
+      <div class="control-block">
+        <div class="control-block-header">
+          <span class="control-num">D</span>
+          <h3>Nebenerträge (Parkplätze + PV)</h3>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-pp-faktor">Parkplatz-Mieten-Faktor</label>
+            <span class="control-value" id="val-pp-faktor">100%</span>
+          </div>
+          <input type="range" id="ctrl-pp-faktor" min="50" max="200" value="100" step="5">
+          <div class="control-hint">Basis: Aussen CHF 100/Mt, TG CHF 150/Mt (Methabau-Leubern-Referenz)</div>
+        </div>
+        <div class="control-item">
+          <div class="control-row">
+            <label for="ctrl-pv-pro-haus">PV-Ertrag pro Haus / Jahr</label>
+            <span class="control-value" id="val-pv-pro-haus">CHF 20'000</span>
+          </div>
+          <input type="range" id="ctrl-pv-pro-haus" min="0" max="80000" value="20000" step="2000">
+          <div class="control-hint">Methabau-Leubern: 65k pro Gebäude (1 grosses Gebäude)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Szenario-Speicher -->
+    <div class="scenario-storage">
+      <div class="scenario-storage-header">
+        <h3>Gespeicherte Szenarien</h3>
+        <span class="scenario-count" id="scenario-count">0 gespeichert</span>
+      </div>
+      <div class="scenario-list" id="scenario-list">
+        <div class="scenario-empty">Noch keine Szenarien gespeichert. Mit «Szenario speichern» einen Zwischenstand sichern.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== BREAKDOWN ============== -->
+<section class="breakdown-section">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Mietertrags-Aufschlüsselung</h2>
+    </div>
+    <div class="breakdown-grid">
+      <div class="breakdown-table">
+        <div class="bt-header">
+          <span>Position</span>
+          <span>Etappe 1</span>
+          <span>Etappe 2</span>
+          <span>Total</span>
+        </div>
+        <div class="bt-row" data-row="hnf">
+          <span class="bt-label">Soll-Mietertrag HNF</span>
+          <span class="bt-val" id="bd-hnf-e1">—</span>
+          <span class="bt-val" id="bd-hnf-e2">—</span>
+          <span class="bt-val bt-total" id="bd-hnf-total">—</span>
+        </div>
+        <div class="bt-row" data-row="nf">
+          <span class="bt-label">+ Nebenflächen-Umlage</span>
+          <span class="bt-val" id="bd-nf-e1">—</span>
+          <span class="bt-val" id="bd-nf-e2">—</span>
+          <span class="bt-val bt-total" id="bd-nf-total">—</span>
+        </div>
+        <div class="bt-row" data-row="pp">
+          <span class="bt-label">+ Parkplätze</span>
+          <span class="bt-val" id="bd-pp-e1">—</span>
+          <span class="bt-val" id="bd-pp-e2">—</span>
+          <span class="bt-val bt-total" id="bd-pp-total">—</span>
+        </div>
+        <div class="bt-row" data-row="pv">
+          <span class="bt-label">+ PV-Anlage</span>
+          <span class="bt-val" id="bd-pv-e1">—</span>
+          <span class="bt-val" id="bd-pv-e2">—</span>
+          <span class="bt-val bt-total" id="bd-pv-total">—</span>
+        </div>
+        <div class="bt-row bt-row-sum" data-row="soll">
+          <span class="bt-label">= Soll-Mietertrag Total</span>
+          <span class="bt-val" id="bd-soll-e1">—</span>
+          <span class="bt-val" id="bd-soll-e2">—</span>
+          <span class="bt-val bt-total" id="bd-soll-total">—</span>
+        </div>
+        <div class="bt-row" data-row="ausfall">
+          <span class="bt-label">./. Mietausfall</span>
+          <span class="bt-val" id="bd-ausfall-e1">—</span>
+          <span class="bt-val" id="bd-ausfall-e2">—</span>
+          <span class="bt-val bt-total" id="bd-ausfall-total">—</span>
+        </div>
+        <div class="bt-row" data-row="bewirt">
+          <span class="bt-label">./. Bewirtschaftung</span>
+          <span class="bt-val" id="bd-bewirt-e1">—</span>
+          <span class="bt-val" id="bd-bewirt-e2">—</span>
+          <span class="bt-val bt-total" id="bd-bewirt-total">—</span>
+        </div>
+        <div class="bt-row bt-row-final" data-row="noi">
+          <span class="bt-label">NOI (Net Operating Income)</span>
+          <span class="bt-val" id="bd-noi-e1">—</span>
+          <span class="bt-val" id="bd-noi-e2">—</span>
+          <span class="bt-val bt-total" id="bd-noi-total">—</span>
+        </div>
+      </div>
+
+      <!-- Donut Chart Mietertrag-Mix -->
+      <div class="breakdown-chart">
+        <h4 class="chart-title">Ertragsmix (Total Projekt)</h4>
+        <svg viewBox="0 0 240 240" class="donut" id="donut-chart"></svg>
+        <div class="donut-legend" id="donut-legend"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-left">
+      <div class="footer-brand">Campus Elgg · Live-Cockpit</div>
+      <div class="footer-meta">Erstellt für VR Viaholding AG · Mai 2026</div>
+    </div>
+    <div class="footer-right">
+      <a href="https://github.com/" class="footer-link" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        Projekt auf GitHub
+      </a>
+      <a href="README.md" class="footer-link">Dokumentation</a>
+      <a href="Campus_Elgg_Renditemodell.xlsx" class="footer-link" download>Excel-Modell</a>
+    </div>
+  </div>
+  <div class="footer-disclaimer">
+    Vertrauliche Investorenunterlage. Werte beruhen auf Annahmen und sind nicht garantiert. Stand März 2026.
+  </div>
+</footer>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="cockpit.js"></script>
 </body>
 </html>
